@@ -11,4 +11,8 @@ export const routes =  [
       href: "#contact",
       text: "Contact",
     },
+    {
+      href: "#jamboard",
+      text: "Jamboard"
+    }
   ];

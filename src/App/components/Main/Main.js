@@ -1,6 +1,7 @@
 import { About } from "../../pages/About/About.js";
 import { Home } from "../../pages/Home/Home.js";
 import { links } from "../Header/Header.js"; // Import links from Header.js
+import {Jamboard} from "../../pages/Jamboard/Jamboard.js"
 
 const MainContent = document.createElement('div');
 MainContent.id = 'main-content';
@@ -29,6 +30,8 @@ links.forEach(link => {
         currentPage = About;  // Set the content to the About page
     } else if (Navigation === 'Contact') {
         currentPage = Contact;  // Set the content to the Contact page (create Contact page component if not already)
+    } else if(Navigation === 'Jamboard') {
+      currentPage = Jamboard
     }
 
     // Append the selected page content to MainContent
