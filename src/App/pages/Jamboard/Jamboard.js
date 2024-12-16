@@ -3,13 +3,27 @@ const Jamboard = document.createElement("section");
 Jamboard.setAttribute("id", "jamboard");
 Jamboard.classList.add("cls-jamboard");
 
+// Centralized state management
+const state = {
+  currentColor: "black", // Current drawing color
+  isEraser: false, // Eraser state
+  isDrawing: false, // Drawing state
+  lastX: 0, // Last X coordinate of the cursor
+  lastY: 0, // Last Y coordinate of the cursor
+};
+
+// Function to update state values
+function updateState(key, value) {
+  state[key] = value;
+}
+
 // Function to create and setup the canvas
 function setupCanvas() {
+  // Create canvas element
   const canvasLayout = document.createElement("canvas");
   canvasLayout.id = "drawingCanvas";
   canvasLayout.width = 800;
   canvasLayout.height = 600;
-
   canvasLayout.style.cursor = "crosshair";
   canvasLayout.style.border = "1px solid #ccc";
 
@@ -28,73 +42,77 @@ function setupCanvas() {
     return;
   }
 
-  // Set initial stroke color
-  let currentColor = "black";
-  let isEraser = false // Eraser State
-
-  // function to set stroke color
+  // Function to set the stroke color
   function setStrokeColor(color) {
-    isEraser = false // Disabled eraser when setting a color
-    currentColor = color;
+    updateState("isEraser", false); // Disable eraser when setting a color
+    updateState("currentColor", color);
   }
 
-  // function to enable the eraser
+  // Function to enable the eraser
   function enableEraser() {
-    isEraser = true
+    updateState("isEraser", true);
   }
-  const colorButton = document.createElement("div");
-  colorButton.setAttribute("id", "color-button");
 
-  const colors = ["black", "green", "red", "yellow", "blue", "purple", "orange"];
+  // Create color buttons and eraser button
+  const controlsContainer = document.createElement("div");
+  controlsContainer.setAttribute("id", "controls-container");
+
+  const colors = [
+    "black",
+    "green",
+    "red",
+    "yellow",
+    "blue",
+    "purple",
+    "orange",
+  ];
 
   colors.forEach((color) => {
     const button = document.createElement("button");
     button.style.background = color;
-    button.style.width = "100px"
-    button.style.height = "50px"
-    button.style.cursor = "pointer"
+    button.style.width = "80px";
+    button.style.height = "40px";
+    button.style.margin = "5px";
+    button.style.cursor = "pointer";
     button.addEventListener("click", () => setStrokeColor(color));
-    colorButton.appendChild(button);
+    controlsContainer.appendChild(button);
   });
 
-  // create eraser button
-  const eraserButton = document.createElement('button')
-  eraserButton.textContent = "Eraser"
-  eraserButton.style.width = "100px"
-  eraserButton.style.height = "50px"
-  eraserButton.style.curser = "pointer"
-  eraserButton.addEventListener("click", enableEraser)
-  colorButton.appendChild(eraserButton)
+  const eraserButton = document.createElement("button");
+  eraserButton.textContent = "Eraser";
+  eraserButton.style.width = "80px";
+  eraserButton.style.height = "40px";
+  eraserButton.style.margin = "5px";
+  eraserButton.style.cursor = "pointer";
+  eraserButton.addEventListener("click", enableEraser);
+  controlsContainer.appendChild(eraserButton);
 
-  // Append color buttons to the page (or Jamboard section)
-  Jamboard.appendChild(colorButton);
+  // Append controls to the Jamboard
+  Jamboard.appendChild(controlsContainer);
 
-  // Drawing state variables
-  let isDrawing = false;
-  let lastX = 0;
-  let lastY = 0;
-
-  // Start drawing
+  // Canvas event handlers
   canvas.addEventListener("mousedown", (event) => {
-    isDrawing = true;
-    [lastX, lastY] = [event.offsetX, event.offsetY];
+    updateState("isDrawing", true);
+    updateState("lastX", event.offsetX);
+    updateState("lastY", event.offsetY);
   });
 
-  // Draw on the canvas
   canvas.addEventListener("mousemove", (event) => {
-    if (!isDrawing) return;
+    if (!state.isDrawing) return;
+
     ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
+    ctx.moveTo(state.lastX, state.lastY);
     ctx.lineTo(event.offsetX, event.offsetY);
-    ctx.strokeStyle = isEraser ? "White" :  currentColor;
-    ctx.lineWidth = isEraser ? 100: 7;
+    ctx.strokeStyle = state.isEraser ? "white" : state.currentColor;
+    ctx.lineWidth = state.isEraser ? 100 : 7;
     ctx.stroke();
-    [lastX, lastY] = [event.offsetX, event.offsetY];
+
+    updateState("lastX", event.offsetX);
+    updateState("lastY", event.offsetY);
   });
 
-  // Stop drawing
-  canvas.addEventListener("mouseup", () => (isDrawing = false));
-  canvas.addEventListener("mouseout", () => (isDrawing = false));
+  canvas.addEventListener("mouseup", () => updateState("isDrawing", false));
+  canvas.addEventListener("mouseout", () => updateState("isDrawing", false));
 }
 
 // Export the Jamboard and setupCanvas function
