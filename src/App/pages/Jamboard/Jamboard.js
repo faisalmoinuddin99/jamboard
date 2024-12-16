@@ -30,10 +30,17 @@ function setupCanvas() {
 
   // Set initial stroke color
   let currentColor = "black";
+  let isEraser = false // Eraser State
 
   // function to set stroke color
   function setStrokeColor(color) {
+    isEraser = false // Disabled eraser when setting a color
     currentColor = color;
+  }
+
+  // function to enable the eraser
+  function enableEraser() {
+    isEraser = true
   }
   const colorButton = document.createElement("div");
   colorButton.setAttribute("id", "color-button");
@@ -50,8 +57,18 @@ function setupCanvas() {
     colorButton.appendChild(button);
   });
 
+  // create eraser button
+  const eraserButton = document.createElement('button')
+  eraserButton.textContent = "Eraser"
+  eraserButton.style.width = "100px"
+  eraserButton.style.height = "50px"
+  eraserButton.style.curser = "pointer"
+  eraserButton.addEventListener("click", enableEraser)
+  colorButton.appendChild(eraserButton)
+
   // Append color buttons to the page (or Jamboard section)
   Jamboard.appendChild(colorButton);
+
   // Drawing state variables
   let isDrawing = false;
   let lastX = 0;
@@ -69,8 +86,8 @@ function setupCanvas() {
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(event.offsetX, event.offsetY);
-    ctx.strokeStyle = currentColor;
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = isEraser ? "White" :  currentColor;
+    ctx.lineWidth = isEraser ? 100: 7;
     ctx.stroke();
     [lastX, lastY] = [event.offsetX, event.offsetY];
   });
