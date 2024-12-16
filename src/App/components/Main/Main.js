@@ -34,6 +34,7 @@ links.forEach((link) => {
       currentPage = Jamboard;
       MainContent.append(currentPage); // Append Jamboard first
       setupCanvas(); // Setup canvas AFTER appending Jamboard
+     
       return;
     }
 
